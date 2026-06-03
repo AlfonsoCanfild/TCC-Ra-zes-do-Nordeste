@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.schema.usuario_schema import UsuarioCreate
 from app.domain.models.usuario import Usuario
 from app.infrastructure.database.database import get_db
+from app.core.security import gerar_hash
 
 router = APIRouter(tags=["Usuários"]) # Define o prefixo para as rotas de usuário, exemplo: /usuarios
 
@@ -17,7 +18,7 @@ def criar_usuario(
     novo_usuario = Usuario(
         nome=usuario.nome,
         email=usuario.email,
-        senha=usuario.senha,
+        senha=gerar_hash(usuario.senha), # Gera um hash da senha antes de armazená-la no banco de dados
         perfil=usuario.perfil
     )
 
