@@ -14,3 +14,10 @@ SessionLocal = sessionmaker(
 )
 
 Base = declarative_base()
+
+def get_db(): # criar a dependência do banco de dados
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()

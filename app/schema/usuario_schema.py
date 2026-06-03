@@ -1,7 +1,7 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
-class UsuarioCreate(BaseModel): # Define a classe UsuarioCreate que herda de BaseModel, são os dados necessários para criar um usuário
+class UsuarioCreate(BaseModel): # Define o modelo de dados para criar um usuário
     nome: str
-    email: str
+    email: EmailStr
     senha: str
     perfil: str

@@ -6,9 +6,9 @@ from app.api.routes.usuario_route import router as usuario_router
 
 app = FastAPI()
 
-app.include_router(usuario_router)
+app.include_router(usuario_router) # Inclui as rotas do usuário no app
 
-Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine) # Cria as tabelas no banco de dados
 
 
 @app.get("/")
