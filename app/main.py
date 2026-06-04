@@ -6,14 +6,15 @@ from app.api.routes.usuario_route import router as usuario_router # Importa o ro
 from app.api.routes.auth_route import router as auth_router # Importa o roteador de rotas de autenticação para incluir as rotas
 from app.domain.models.produto import Produto # Importa a classe Produto do módulo de modelos
 from app.api.routes.produto_route import router as produto_router # Importa o roteador de rotas de produto para incluir as rotas
+from app.domain.models.unidade import Unidade # Importa a classe Unidade do módulo de modelos
+from app.api.routes.unidade_route import router as unidade_router # Importa o roteador de rotas de unidade para incluir as rotas
 
 app = FastAPI()
 
 app.include_router(auth_router) # Inclui as rotas de autenticação no app
-
 app.include_router(usuario_router) # Inclui as rotas do usuário no app
-
 app.include_router(produto_router) # Inclui as rotas de produto no app
+app.include_router(unidade_router) # Inclui as rotas de unidade no app
 
 Base.metadata.create_all(bind=engine) # Cria as tabelas no banco de dados
 
