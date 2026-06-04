@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from decimal import Decimal
 
-class ProdutoCreate(BaseModel): # Define a classe ProdutoCreate que herda da base
+class ProdutoCreate(BaseModel): # Usada para criar um novo produto.
 
     nome: str
 
@@ -13,7 +13,7 @@ class ProdutoCreate(BaseModel): # Define a classe ProdutoCreate que herda da bas
     
 # Schema de resposta
 
-class ProdutoResponse(BaseModel): # Define a classe ProdutoResponse que herda da base
+class ProdutoResponse(BaseModel): # Usada para representar a resposta de um produto, incluindo o ID do produto.
 
     idProduto: int
 
@@ -27,3 +27,13 @@ class ProdutoResponse(BaseModel): # Define a classe ProdutoResponse que herda da
 
     class Config:
         from_attributes = True
+        
+class ProdutoUpdate(BaseModel): # Classe usada para atualizar um produto existente.
+
+    nome: str
+
+    descricao: str
+
+    preco: Decimal
+
+    status: str
