@@ -31,11 +31,17 @@ def criar_item_pedido(
     db: Session = Depends(get_db)
 ):
 
+    if item.quantidade <= 0: # Valida se a quantidade é maior que zero
+        raise HTTPException(
+            status_code=400,
+            detail="Quantidade deve ser maior que zero"
+        )
+
     pedido = db.query(Pedido).filter(
         Pedido.idPedido == item.idPedido
     ).first()
 
-    if not pedido:
+    if not pedido: # Valida se o pedido existe
         raise HTTPException(
             status_code=404,
             detail="Pedido não encontrado"
@@ -45,7 +51,7 @@ def criar_item_pedido(
         Produto.idProduto == item.idProduto
     ).first()
 
-    if not produto:
+    if not produto: #
         raise HTTPException(
             status_code=404,
             detail="Produto não encontrado"
@@ -55,7 +61,7 @@ def criar_item_pedido(
         Estoque.idProduto == item.idProduto
     ).first()
 
-    if not estoque:
+    if not estoque: # Valida se o produto tem registro de estoque
         raise HTTPException(
             status_code=404,
             detail="Produto sem registro de estoque"
@@ -74,7 +80,7 @@ def criar_item_pedido(
         preco_unitario=produto.preco
     )
 
-    db.add(novo_item)
+    db.add(novo_item) # Adiciona o novo item de pedido à sessão do banco de dados
 
     # baixa estoque
     estoque.quantidade -= item.quantidade
