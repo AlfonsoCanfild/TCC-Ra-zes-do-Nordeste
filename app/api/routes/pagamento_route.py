@@ -2,12 +2,15 @@ from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
 
+from math import ceil
+
 from sqlalchemy.orm import Session
 
 from app.infrastructure.database.database import get_db
 
 from app.domain.models.pagamento import Pagamento
 from app.domain.models.pedido import Pedido
+from app.domain.models.fidelidade import Fidelidade
 
 from app.schema.pagamento_schema import (
     PagamentoMockRequest,
@@ -55,6 +58,27 @@ def realizar_pagamento_mock(
     db.add(novo_pagamento)
 
     pedido.status = "PAGO"
+
+    # FIDELIDADE: Calcula os pontos ganhos com base no valor total do pedido e atualiza os pontos
+
+    pontos_ganhos = ceil(float(pedido.total)) # Converte o valor total para float e arredonda para cima os pontos ganhos
+
+    fidelidade = db.query(Fidelidade).filter(
+        Fidelidade.idUsuario == pedido.idUsuario
+    ).first()
+
+    if fidelidade:
+
+        fidelidade.pontos += pontos_ganhos # Atualiza os pontos do programa de fidelidade do usuário existente
+
+    else: # Se o usuário ainda não tiver um registro de fidelidade, cria um novo registro com os pontos ganhos
+
+        fidelidade = Fidelidade(
+            idUsuario=pedido.idUsuario,
+            pontos=pontos_ganhos
+        )
+
+    db.add(fidelidade)
 
     db.commit()
 

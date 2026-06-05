@@ -15,6 +15,8 @@ from app.domain.models.item_pedido import ItemPedido # Importa a classe ItemPedi
 from app.api.routes.item_pedido_route import router as item_pedido_router # Importa o roteador de rotas de item de pedido
 from app.domain.models.pagamento import Pagamento # Importa a classe Pagamento
 from app.api.routes.pagamento_route import router as pagamento_router # Importa o roteador de rotas de pagamento
+from app.domain.models.fidelidade import Fidelidade # Importa a classe Fidelidade
+from app.api.routes.fidelidade_route import router as fidelidade_router # Importa o roteador de rotas de fidelidade
 
 app = FastAPI()
 
@@ -26,6 +28,7 @@ app.include_router(estoque_router) # Inclui as rotas de estoque
 app.include_router(pedido_router) # Inclui as rotas de pedido
 app.include_router(item_pedido_router) # Inclui as rotas de item de pedido
 app.include_router(pagamento_router) # Inclui as rotas de pagamento
+app.include_router(fidelidade_router) # Inclui as rotas de fidelidade
 
 Base.metadata.create_all(bind=engine) # Cria as tabelas no banco de dados
 
