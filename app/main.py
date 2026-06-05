@@ -13,6 +13,8 @@ from app.api.routes.estoque_route import router as estoque_router # Importa o ro
 from app.api.routes.pedido_route import router as pedido_router # Importa o roteador de rotas de pedido
 from app.domain.models.item_pedido import ItemPedido # Importa a classe ItemPedido
 from app.api.routes.item_pedido_route import router as item_pedido_router # Importa o roteador de rotas de item de pedido
+from app.domain.models.pagamento import Pagamento # Importa a classe Pagamento
+from app.api.routes.pagamento_route import router as pagamento_router # Importa o roteador de rotas de pagamento
 
 app = FastAPI()
 
@@ -23,6 +25,7 @@ app.include_router(unidade_router) # Inclui as rotas de unidade
 app.include_router(estoque_router) # Inclui as rotas de estoque
 app.include_router(pedido_router) # Inclui as rotas de pedido
 app.include_router(item_pedido_router) # Inclui as rotas de item de pedido
+app.include_router(pagamento_router) # Inclui as rotas de pagamento
 
 Base.metadata.create_all(bind=engine) # Cria as tabelas no banco de dados
 
