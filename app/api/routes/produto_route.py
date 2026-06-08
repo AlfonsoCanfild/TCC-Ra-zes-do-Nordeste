@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from fastapi import Depends
 
+from app.core.dependencies import permitir_perfis
 from sqlalchemy.orm import Session
 from app.infrastructure.database.database import get_db
 from app.domain.models.produto import Produto
@@ -21,7 +22,12 @@ router = APIRouter(tags=["Produtos"]) # Cria um roteador para as rotas relaciona
 )
 def criar_produto(
     produto: ProdutoCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    usuario = Depends(
+        permitir_perfis(
+            ["ADMIN", "GERENTE"]
+        )
+    )
 ): # Define a função criar_produto que recebe um objeto do tipo ProdutoCreate e uma sessão de banco de dados como dependência.
 
     novo_produto = Produto(
