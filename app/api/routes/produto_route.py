@@ -90,8 +90,13 @@ def buscar_produto(
 )
 def atualizar_produto(
     idProduto: int,
-    dados: ProdutoUpdate,
-    db: Session = Depends(get_db)
+    produto: ProdutoCreate,
+    db: Session = Depends(get_db),
+    usuario = Depends(
+        permitir_perfis(
+            ["ADMIN", "GERENTE"] # Permite que apenas usuários com perfil "ADMIN" ou "GERENTE" acessem.
+        )
+    )
 ):
 
     produto = db.query(Produto).filter(
@@ -118,12 +123,16 @@ def atualizar_produto(
 
 # Rota para deletar/inativar um produto
 @router.delete(
-    "/produtos/{idProduto}",
-    status_code=200
+    "/produtos/{idProduto}"
 )
-def inativar_produto(
+def excluir_produto(
     idProduto: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    usuario = Depends(
+        permitir_perfis(
+            ["ADMIN"] # Permite que apenas usuários com perfil "ADMIN" acessem.
+        )
+    )
 ):
 
     produto = db.query(Produto).filter(

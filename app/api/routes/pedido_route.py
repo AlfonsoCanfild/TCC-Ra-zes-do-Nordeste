@@ -5,6 +5,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app.infrastructure.database.database import get_db
+from app.core.dependencies import permitir_perfis
 
 from app.domain.models.pedido import Pedido
 from app.domain.models.usuario import Usuario
@@ -26,11 +27,16 @@ router = APIRouter(tags=["Pedidos"])
 )
 def criar_pedido(
     pedido: PedidoCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    usuario_logado = Depends(
+        permitir_perfis(
+            ["ADMIN", "GERENTE", "CLIENTE"]
+        )
+    )
 ):
 
     usuario = db.query(Usuario).filter(
-        Usuario.idUsuario == pedido.idUsuario
+        Usuario.email == usuario_logado["email"]
     ).first()
 
     if not usuario:
@@ -50,7 +56,7 @@ def criar_pedido(
         )
 
     novo_pedido = Pedido(
-        idUsuario=pedido.idUsuario,
+        idUsuario=usuario.idUsuario,
         idUnidade=pedido.idUnidade,
         canalPedido=pedido.canalPedido,
         status="CRIADO",
@@ -64,3 +70,48 @@ def criar_pedido(
     db.refresh(novo_pedido)
 
     return novo_pedido
+
+# Rota para listar todos os pedidos, considerando a validação do usuário
+@router.get(
+    "/pedidos",
+    response_model=list[PedidoResponse]
+)
+def listar_pedidos(
+    db: Session = Depends(get_db),
+    usuario_logado = Depends(
+        permitir_perfis(
+            ["ADMIN", "GERENTE"]
+        )
+    )
+):
+
+    pedidos = db.query(Pedido).all()
+
+    return pedidos
+
+# Rota para buscar um pedido por ID, considerando a validação do usuário
+@router.get(
+    "/pedidos/{idPedido}",
+    response_model=PedidoResponse
+)
+def buscar_pedido(
+    idPedido: int,
+    db: Session = Depends(get_db),
+    usuario_logado = Depends(
+        permitir_perfis(
+            ["ADMIN", "GERENTE"]
+        )
+    )
+):
+
+    pedido = db.query(Pedido).filter(
+        Pedido.idPedido == idPedido
+    ).first()
+
+    if not pedido:
+        raise HTTPException(
+            status_code=404,
+            detail="Pedido não encontrado"
+        )
+
+    return pedido

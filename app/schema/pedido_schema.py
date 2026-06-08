@@ -4,8 +4,6 @@ from pydantic import BaseModel
 # Esquema de Pedido para criação e resposta, utilizando Pydantic para validação e serialização dos dados
 class PedidoCreate(BaseModel):
 
-    idUsuario: int
-
     idUnidade: int
 
     canalPedido: str

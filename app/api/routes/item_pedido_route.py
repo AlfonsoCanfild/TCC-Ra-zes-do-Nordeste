@@ -58,7 +58,8 @@ def criar_item_pedido(
         )
 
     estoque = db.query(Estoque).filter(
-        Estoque.idProduto == item.idProduto
+        Estoque.idProduto == item.idProduto,
+        Estoque.idUnidade == pedido.idUnidade
     ).first()
 
     if not estoque: # Valida se o produto tem registro de estoque
@@ -86,7 +87,9 @@ def criar_item_pedido(
     estoque.quantidade -= item.quantidade
 
     # recalcula total do pedido
-    pedido.total += Decimal(produto.preco) * item.quantidade
+    valor_item = produto.preco * Decimal(item.quantidade)
+
+    pedido.total += valor_item
 
     db.commit()
 

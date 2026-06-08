@@ -4,6 +4,7 @@ from fastapi import HTTPException
 
 from sqlalchemy.orm import Session
 from app.infrastructure.database.database import get_db
+from app.core.dependencies import permitir_perfis
 
 from app.domain.models.estoque import Estoque
 from app.domain.models.produto import Produto
@@ -25,7 +26,12 @@ router = APIRouter(tags=["Estoque"])
 )
 def criar_estoque(
     estoque: EstoqueCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    usuario = Depends(
+        permitir_perfis(
+            ["ADMIN", "GERENTE"]
+        )
+    )
 ):
 
     unidade = db.query(Unidade).filter(
@@ -108,7 +114,12 @@ def buscar_estoque(
 def atualizar_estoque(
     idEstoque: int,
     dados: EstoqueUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    usuario = Depends(
+        permitir_perfis(
+            ["ADMIN", "GERENTE"]
+        )
+    )
 ):
 
     estoque = db.query(Estoque).filter(
@@ -137,7 +148,12 @@ def atualizar_estoque(
 )
 def excluir_estoque(
     idEstoque: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    usuario = Depends(
+        permitir_perfis(
+            ["ADMIN"]
+        )
+    )
 ):
 
     estoque = db.query(Estoque).filter(
