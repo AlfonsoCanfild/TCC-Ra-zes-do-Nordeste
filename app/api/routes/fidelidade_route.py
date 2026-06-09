@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from app.infrastructure.database.database import get_db
 from app.core.dependencies import permitir_perfis
 from app.domain.models.fidelidade import Fidelidade
-from app.domain.models.usuario import idUsuario
+from app.domain.models.usuario import Usuario
 
 from app.schema.fidelidade_schema import (
     FidelidadeResponse
@@ -31,7 +31,7 @@ def listar_fidelidade(
 ):
 
     fidelidade = db.query(Fidelidade).filter(
-        Fidelidade.idUsuario == idUsuario
+        Fidelidade.idUsuario == Usuario.idUsuario
     ).first()
 
     if not fidelidade: # Se o usuário não tiver um programa de fidelidade, retorna um erro 404
