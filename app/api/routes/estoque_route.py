@@ -10,6 +10,8 @@ from app.domain.models.estoque import Estoque
 from app.domain.models.produto import Produto
 from app.domain.models.unidade import Unidade
 
+from app.core.auditoria import registrar_auditoria
+
 from app.schema.estoque_schema import (
     EstoqueCreate,
     EstoqueResponse,
@@ -65,6 +67,15 @@ def criar_estoque(
     db.commit()
 
     db.refresh(novo_estoque)
+    
+    # Registra a ação de criação do estoque na tabela de auditoria, associando-a ao usuário que realizou a ação.
+    registrar_auditoria(
+        db=db,
+        idUsuario=usuario["idUsuario"],
+        acao="CRIAR",
+        entidade="ESTOQUE",
+        idRegistro=novo_estoque.idEstoque
+    )
 
     return novo_estoque
 
@@ -137,6 +148,15 @@ def atualizar_estoque(
     db.commit()
 
     db.refresh(estoque)
+    
+    # Registra a ação de atualização do estoque na tabela de auditoria, associando-a ao usuário que realizou a ação.
+    registrar_auditoria(
+        db=db,
+        idUsuario=usuario["idUsuario"],
+        acao="ATUALIZAR",
+        entidade="ESTOQUE",
+        idRegistro=estoque.idEstoque
+    )
 
     return estoque
 
@@ -169,6 +189,15 @@ def excluir_estoque(
     db.delete(estoque)
 
     db.commit()
+    
+    # Registra a ação de exclusão do estoque na tabela de auditoria, associando-a ao usuário que realizou a ação.
+    registrar_auditoria(
+        db=db,
+        idUsuario=usuario["idUsuario"],
+        acao="EXCLUIR",
+        entidade="ESTOQUE",
+        idRegistro=idEstoque
+    )
 
     return {
         "message": "Registro de estoque removido com sucesso"

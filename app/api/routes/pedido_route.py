@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.infrastructure.database.database import get_db
 from app.core.dependencies import permitir_perfis
+from app.core.auditoria import registrar_auditoria
 
 from app.domain.models.pedido import Pedido
 from app.domain.models.usuario import Usuario
@@ -68,6 +69,15 @@ def criar_pedido(
     db.commit()
 
     db.refresh(novo_pedido)
+    
+    # Registra a ação de criação do pedido na tabela de auditoria, associando-a ao usuário que realizou a ação.
+    registrar_auditoria(
+        db=db,
+        idUsuario=usuario.idUsuario,
+        acao="CRIAR",
+        entidade="PEDIDO",
+        idRegistro=novo_pedido.idPedido
+    )
 
     return novo_pedido
 

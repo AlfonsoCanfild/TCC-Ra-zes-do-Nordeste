@@ -65,6 +65,7 @@ def get_current_user(
             )
 
         return {
+            "idUsuario": payload.get("idUsuario"),
             "email": email,
             "perfil": perfil
         }

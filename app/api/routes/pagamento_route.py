@@ -7,7 +7,7 @@ from math import ceil
 from sqlalchemy.orm import Session
 
 from app.infrastructure.database.database import get_db
-
+from app.core.auditoria import registrar_auditoria
 from app.domain.models.pagamento import Pagamento
 from app.domain.models.pedido import Pedido
 from app.domain.models.fidelidade import Fidelidade
@@ -46,7 +46,35 @@ def realizar_pagamento_mock(
             status_code=409,
             detail="Pedido já foi pago"
         )
+        
+    # SIMULAÇÃO DE PAGAMENTO REJEITADO
+    if pagamento.formaPagamento == "RECUSADO":
 
+        novo_pagamento = Pagamento(
+            idPedido=pedido.idPedido,
+            formaPagamento=pagamento.formaPagamento,
+            valor=pedido.total,
+            status="REJEITADO"
+        )
+
+        db.add(novo_pagamento)
+
+        db.commit()
+
+        db.refresh(novo_pagamento)
+
+        registrar_auditoria(
+            db=db,
+            idUsuario=pedido.idUsuario,
+            acao="PAGAMENTO_REJEITADO",
+            entidade="PAGAMENTO",
+            idRegistro=novo_pagamento.idPagamento
+        )
+
+        return novo_pagamento
+
+    # FLUXO NORMAL (APROVADO)
+    
     # Cria um novo registro de pagamento com os dados fornecidos e o valor total do pedido, e atualiza o status para "PAGO"
     novo_pagamento = Pagamento(
         idPedido=pedido.idPedido,
@@ -83,5 +111,14 @@ def realizar_pagamento_mock(
     db.commit()
 
     db.refresh(novo_pagamento)
+    
+    # REGISTRO DE AUDITORIA: Registra a ação de pagamento aprovado na tabela de auditoria para fins de rastreamento e monitoramento
+    registrar_auditoria(
+        db=db,
+        idUsuario=pedido.idUsuario,
+        acao="PAGAMENTO_APROVADO",
+        entidade="PAGAMENTO",
+        idRegistro=novo_pagamento.idPagamento
+    )
 
     return novo_pagamento

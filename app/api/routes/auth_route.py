@@ -51,7 +51,8 @@ def login(
 
     token = criar_token({
         "sub": usuario.email,
-        "perfil": usuario.perfil
+        "perfil": usuario.perfil,
+        "idUsuario": usuario.idUsuario
     })
 
     return {

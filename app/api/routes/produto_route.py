@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.infrastructure.database.database import get_db
 from app.domain.models.produto import Produto
 from fastapi import HTTPException
+from app.core.auditoria import registrar_auditoria
 from app.schema.produto_schema import (
     ProdutoCreate,
     ProdutoResponse,
@@ -42,6 +43,15 @@ def criar_produto(
     db.commit()
 
     db.refresh(novo_produto)
+    
+    # Registra a ação de criação do produto na tabela de auditoria, associando-a ao usuário que realizou a ação.
+    registrar_auditoria(
+        db=db,
+        idUsuario=usuario["idUsuario"],
+        acao="CRIAR",
+        entidade="PRODUTO",
+        idRegistro=novo_produto.idProduto
+    )
 
     return novo_produto
 
@@ -90,11 +100,11 @@ def buscar_produto(
 )
 def atualizar_produto(
     idProduto: int,
-    produto: ProdutoCreate,
+    dados: ProdutoUpdate,
     db: Session = Depends(get_db),
     usuario = Depends(
         permitir_perfis(
-            ["ADMIN", "GERENTE"] # Permite que apenas usuários com perfil "ADMIN" ou "GERENTE" acessem.
+            ["ADMIN", "GERENTE"]
         )
     )
 ):
@@ -103,7 +113,7 @@ def atualizar_produto(
         Produto.idProduto == idProduto
     ).first()
 
-    if not produto: # Lança uma exceção HTTP 404 se o produto não for encontrado no banco de dados.
+    if not produto:
         raise HTTPException(
             status_code=404,
             detail="Produto não encontrado"
@@ -117,6 +127,14 @@ def atualizar_produto(
     db.commit()
 
     db.refresh(produto)
+
+    registrar_auditoria(
+        db=db,
+        idUsuario=usuario["idUsuario"],
+        acao="ATUALIZAR",
+        entidade="PRODUTO",
+        idRegistro=produto.idProduto
+    )
 
     return produto
 
@@ -148,6 +166,15 @@ def excluir_produto(
     produto.status = "INATIVO"
 
     db.commit()
+    
+    # Registra a ação de exclusão do produto na tabela de auditoria, associando-a ao usuário que realizou a ação.
+    registrar_auditoria(
+        db=db,
+        idUsuario=usuario["idUsuario"],
+        acao="EXCLUIR",
+        entidade="PRODUTO",
+        idRegistro=idProduto
+    )
 
     return {
         "message": "Produto inativado com sucesso"
