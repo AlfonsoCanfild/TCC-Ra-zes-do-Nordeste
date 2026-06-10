@@ -4,7 +4,7 @@ from fastapi import HTTPException
 
 from sqlalchemy.orm import Session
 
-from app.schema.auth_schema import LoginRequest
+from fastapi.security import OAuth2PasswordRequestForm # Importa o formulário de requisição de login do FastAPI
 
 from app.domain.models.usuario import Usuario
 
@@ -18,26 +18,32 @@ router = APIRouter(tags=["Auth"])
 
 @router.post("/auth/login")
 def login(
-    dados: LoginRequest,
+    dados: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ):
 
+    print("Email recebido:", dados.username)
+
     usuario = db.query(Usuario).filter(
-        Usuario.email == dados.email
+        Usuario.email == dados.username
     ).first()
 
-    if not usuario:
+    print("Usuario encontrado:", usuario)
 
+    if not usuario:
         raise HTTPException(
             status_code=401,
             detail="Credenciais inválidas"
         )
 
-    if not verificar_senha(
-        dados.senha,
+    senha_valida = verificar_senha(
+        dados.password,
         usuario.senha
-    ):
+    )
 
+    print("Senha válida:", senha_valida)
+
+    if not senha_valida:
         raise HTTPException(
             status_code=401,
             detail="Credenciais inválidas"
