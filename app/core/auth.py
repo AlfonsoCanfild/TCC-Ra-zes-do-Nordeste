@@ -1,17 +1,17 @@
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
+from dotenv import load_dotenv
+import os
 
-# Biblioteca para manipulação de tokens JWT
 from jose import jwt
 from jose import JWTError
-
-# Biblioteca para autenticação OAuth2
-from fastapi import Depends
-from fastapi import HTTPException
-
+from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 
-SECRET_KEY = "raizes_do_nordeste_secret"
+# Carrega as variáveis definidas no arquivo .env
+load_dotenv()
+
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 ALGORITHM = "HS256"
 

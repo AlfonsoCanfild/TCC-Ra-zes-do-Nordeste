@@ -15,20 +15,15 @@ from app.core.auth import criar_token
 
 router = APIRouter(tags=["Auth"])
 
-
+# Rota de login para autenticação do usuário e geração de token JWT
 @router.post("/auth/login")
 def login(
-    dados: OAuth2PasswordRequestForm = Depends(),
+    dados: OAuth2PasswordRequestForm = Depends(), # Recebe os dados de login (username e password)
     db: Session = Depends(get_db)
 ):
-
-    print("Email recebido:", dados.username)
-
     usuario = db.query(Usuario).filter(
         Usuario.email == dados.username
     ).first()
-
-    print("Usuario encontrado:", usuario)
 
     if not usuario:
         raise HTTPException(
@@ -40,8 +35,6 @@ def login(
         dados.password,
         usuario.senha
     )
-
-    print("Senha válida:", senha_valida)
 
     if not senha_valida:
         raise HTTPException(
