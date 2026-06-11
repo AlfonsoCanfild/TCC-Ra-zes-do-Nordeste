@@ -13,12 +13,12 @@ from app.domain.models.usuario import Usuario
 from app.domain.models.unidade import Unidade
 
 from app.schema.pedido_schema import (
+    CanalPedidoEnum,
     PedidoCreate,
     PedidoResponse
 )
 
 router = APIRouter(tags=["Pedidos"])
-
 
 # Rota para criar um novo pedido, considerando a validação do usuário e da unidade
 @router.post(
@@ -92,12 +92,19 @@ def listar_pedidos(
         permitir_perfis(
             ["ADMIN", "GERENTE"]
         )
-    )
+    ),
+    canalPedido: CanalPedidoEnum = None
 ):
 
-    pedidos = db.query(Pedido).all()
+    query = db.query(Pedido)
 
-    return pedidos
+    # Se o canal for informado, filtra — senão retorna todos
+    if canalPedido:
+        query = query.filter(
+            Pedido.canalPedido == canalPedido
+        )
+
+    return query.all()
 
 # Rota para buscar um pedido por ID, considerando a validação do usuário
 @router.get(
