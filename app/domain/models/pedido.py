@@ -4,7 +4,8 @@ from sqlalchemy import (
     String,
     ForeignKey,
     Numeric,
-    DateTime
+    DateTime,
+    Enum as SAEnum  # Enum do SQLAlchemy para o banco de dados
 )
 
 from sqlalchemy.sql import func
@@ -33,8 +34,9 @@ class Pedido(Base):
         nullable=False
     )
 
+    # Enum no banco garante integridade mesmo fora da API, conforme regra de negócios
     canalPedido = Column(
-        String(20),
+        SAEnum("APP", "TOTEM", "BALCAO", "PICKUP", "WEB", name="canal_pedido_enum"),
         nullable=False
     )
 

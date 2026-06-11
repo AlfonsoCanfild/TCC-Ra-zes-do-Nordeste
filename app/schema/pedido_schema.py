@@ -1,14 +1,23 @@
 from decimal import Decimal
+from enum import Enum
 from pydantic import BaseModel
 
-# Esquema de Pedido para criação e resposta, utilizando Pydantic para validação e serialização dos dados
+# Apenas os canais válidos conforme regra de negócio
+class CanalPedidoEnum(str, Enum):
+    APP    = "APP"
+    TOTEM  = "TOTEM"
+    BALCAO = "BALCAO"
+    PICKUP = "PICKUP"
+    WEB    = "WEB"
+
+# Esquema de Pedido para criação e resposta
 class PedidoCreate(BaseModel):
 
     idUnidade: int
 
-    canalPedido: str
+    canalPedido: CanalPedidoEnum  # Pydantic valida e rejeita valores inválidos com 422
 
-# Esquema de Pedido para resposta, incluindo o ID do pedido e os campos do pedido, utilizando Pydantic
+# Esquema de Pedido para resposta
 class PedidoResponse(BaseModel):
 
     idPedido: int
