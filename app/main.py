@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.exceptions import HTTPException, RequestValidationError
 
 from app.infrastructure.database.database import engine, Base # Importa o objeto Base do módulo de banco de dados para criar as tabelas
 from app.domain.models.usuario import Usuario # Importa a classe Usuario
@@ -20,6 +21,11 @@ from app.api.routes.fidelidade_route import router as fidelidade_router # Import
 from app.api.routes.relatorio_route import router as relatorio_router # Importa o roteador de rotas de relatório
 from app.api.routes.auditoria_route import router as auditoria_router # Importa o roteador de rotas de auditoria
 
+from app.core.exception_handlers import (
+    http_exception_handler,
+    validation_exception_handler,
+    generic_exception_handler) # Importa os handlers personalizados para tratamento de exceções
+
 app = FastAPI()
 
 app.include_router(auth_router) # Inclui as rotas de autenticação
@@ -33,6 +39,10 @@ app.include_router(pagamento_router) # Inclui as rotas de pagamento
 app.include_router(fidelidade_router) # Inclui as rotas de fidelidade
 app.include_router(relatorio_router) # Inclui as rotas de relatório
 app.include_router(auditoria_router) # Inclui as rotas de auditoria
+
+app.add_exception_handler(HTTPException, http_exception_handler) # Adiciona o handler para exceções HTTP
+app.add_exception_handler(RequestValidationError, validation_exception_handler) # Adiciona o handler para erros de validação do Pydantic
+app.add_exception_handler(Exception, generic_exception_handler) # Adiciona o handler para erros genéricos não tratados
 
 Base.metadata.create_all(bind=engine) # Cria as tabelas no banco de dados
 

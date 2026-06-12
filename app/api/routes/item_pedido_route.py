@@ -12,6 +12,8 @@ from app.domain.models.pedido import Pedido
 from app.domain.models.produto import Produto
 from app.domain.models.estoque import Estoque
 
+from app.core.dependencies import permitir_perfis
+
 from app.schema.item_pedido_schema import (
     ItemPedidoCreate,
     ItemPedidoResponse
@@ -28,7 +30,12 @@ router = APIRouter(tags=["Itens Pedido"])
 )
 def criar_item_pedido(
     item: ItemPedidoCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    usuario_logado = Depends(
+        permitir_perfis(
+            ["ADMIN", "GERENTE", "CLIENTE"]
+        )
+    )
 ):
 
     if item.quantidade <= 0: # Valida se a quantidade é maior que zero

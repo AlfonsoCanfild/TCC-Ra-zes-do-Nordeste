@@ -15,7 +15,9 @@ from app.domain.models.unidade import Unidade
 from app.schema.pedido_schema import (
     CanalPedidoEnum,
     PedidoCreate,
-    PedidoResponse
+    PedidoResponse,
+    PedidoStatusUpdate,
+    StatusPedidoEnum
 )
 
 router = APIRouter(tags=["Pedidos"])
@@ -130,5 +132,73 @@ def buscar_pedido(
             status_code=404,
             detail="Pedido não encontrado"
         )
+
+    return pedido
+
+
+# Define quais transições de status são permitidas a partir de cada status atual
+TRANSICOES_PERMITIDAS = {
+    "CRIADO":     ["EM_PREPARO", "CANCELADO"],
+    "PAGO":       ["EM_PREPARO", "CANCELADO"],
+    "EM_PREPARO": ["PRONTO", "CANCELADO"],
+    "PRONTO":     ["ENTREGUE"],
+    "ENTREGUE":   [],
+    "CANCELADO":  []
+}
+
+# Rota para atualizar o status de um pedido, validando a transição
+@router.patch(
+    "/pedidos/{idPedido}/status",
+    response_model=PedidoResponse
+)
+def atualizar_status_pedido(
+    idPedido: int,
+    dados: PedidoStatusUpdate,
+    db: Session = Depends(get_db),
+    usuario_logado = Depends(
+        permitir_perfis(
+            ["ADMIN", "GERENTE"]
+        )
+    )
+):
+
+    pedido = db.query(Pedido).filter(
+        Pedido.idPedido == idPedido
+    ).first()
+
+    if not pedido:
+        raise HTTPException(
+            status_code=404,
+            detail="Pedido não encontrado"
+        )
+
+    status_atual = pedido.status
+    novo_status = dados.status.value
+
+    transicoes_validas = TRANSICOES_PERMITIDAS.get(status_atual, [])
+
+    if novo_status not in transicoes_validas:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Não é possível alterar o status de '{status_atual}' para '{novo_status}'"
+        )
+
+    pedido.status = novo_status
+
+    db.commit()
+
+    db.refresh(pedido)
+
+    usuario = db.query(Usuario).filter(
+        Usuario.email == usuario_logado["email"]
+    ).first()
+
+    registrar_auditoria(
+        db=db,
+        idUsuario=usuario.idUsuario,
+        acao="ATUALIZAR_STATUS",
+        entidade="PEDIDO",
+        idRegistro=pedido.idPedido
+    )
 
     return pedido
