@@ -84,61 +84,49 @@ source venv/bin/activate
 
 ### 4. Instale as dependências
 
-```bash
-pip install fastapi uvicorn sqlalchemy psycopg2-binary pydantic[email] python-jose[cryptography] passlib[bcrypt] python-dotenv
-```
-
-> 💡 Se preferir, gere um `requirements.txt` com `pip freeze > requirements.txt` depois de instalar tudo, assim quem for rodar o projeto só precisa de `pip install -r requirements.txt`.
+``bash``
+pip install -r requirements.txt
 
 ### 5. Configure as variáveis de ambiente
 
 Copie o arquivo de exemplo e ajuste com os seus dados:
 
-```bash
+``bash``
 cp .env.example .env
-```
 
 Abra o `.env` e preencha:
 
-```
 DATABASE_URL=postgresql://postgres:SUASENHA@localhost:5432/raizes_do_nordeste
 SECRET_KEY=uma_chave_secreta_qualquer
-```
 
 ### 6. Crie o banco de dados
 
 No PostgreSQL, crie um banco vazio com o nome que você definiu no `DATABASE_URL`:
 
-```sql
+``sql``
 CREATE DATABASE raizes_do_nordeste;
-```
 
-As tabelas são criadas automaticamente pela aplicação na primeira execução (via `Base.metadata.create_all`), então não é necessário rodar nenhum script de criação manual.
+As tabelas são criadas automaticamente pelo APP na primeira execução, então não é necessário rodar nenhum script de criação manual.
 
 ### 7. Suba a aplicação
 
-```bash
+``bash``
 uvicorn app.main:app --reload
-```
 
 Se tudo der certo, a API estará disponível em:
-
-```
 http://127.0.0.1:8000
-```
 
 E a documentação interativa (Swagger) em:
-
-```
 http://127.0.0.1:8000/docs
-```
+
 
 ---------------------------------------------
 
 ## 🔐 Autenticação
 
-A maior parte das rotas exige autenticação via **JWT**. O fluxo é:
+A maior parte das rotas exige autenticação via **JWT**, conforme regra de negócios.
 
+O fluxo é:
 1. Crie um usuário em `POST /usuarios`
 2. Faça login em `POST /auth/login` (envie `email` e `senha`)
 3. A resposta traz um `access_token`
@@ -148,43 +136,39 @@ A maior parte das rotas exige autenticação via **JWT**. O fluxo é:
 
 O sistema trabalha com três perfis, que controlam o que cada usuário pode fazer:
 
-| Perfil | Permissões |
-|---------------------------------------------|---------------------------------------------|
-| `ADMIN` | Acesso total ao sistema |
+|  Perfil   |               Permissões                          |
+| `ADMIN`   | Acesso total ao sistema                           |
 | `GERENTE` | Gerencia pedidos, estoque e relatórios da unidade |
-| `CLIENTE` | Cria pedidos e consulta seus próprios dados |
+| `CLIENTE` | Cria pedidos e consulta seus próprios dados       |
 
-> ⚠️ Como o cadastro de usuário com perfil `ADMIN` agora é uma rota protegida, é necessário criar o primeiro usuário administrador diretamente no banco de dados antes de usar o sistema. Veja a seção [Criando o usuário ADMIN inicial](#-criando-o-usuário-admin-inicial).
 
 ---------------------------------------------
 
 ## 👤 Criando o usuário ADMIN inicial
 
-Como o `POST /usuarios` exige um token de `ADMIN` para cadastrar novos usuários, é preciso inserir o primeiro administrador manualmente.
+Como o `POST /usuarios` exige o token de `ADMIN` para cadastrar novos usuários, é obrigatório criar primeiro o Admin manualmente.
 
 1. Gere o hash da senha desejada rodando no terminal Python (dentro do ambiente virtual):
 
-```python
+``python``
 from passlib.context import CryptContext
 pwd = CryptContext(schemes=["bcrypt"], deprecated="auto")
 print(pwd.hash("sua_senha_aqui"))
-```
 
 2. Copie o hash gerado e insira no banco via SQL:
 
-```sql
+``sql``
 INSERT INTO usuarios (nome, email, senha, perfil)
 VALUES ('Administrador', 'admin@raizesdonordeste.com', '<hash_gerado_aqui>', 'ADMIN');
-```
 
 3. Faça login normalmente em `POST /auth/login` com esse e-mail e senha para gerar o token de administrador.
+
 
 ---------------------------------------------
 
 ## 📌 Principais endpoints
 
 | Método | Rota | Descrição |
-|---------------------------------------------|---------------------------------------------|---------------------------------------------|
 | `POST` | `/auth/login` | Login e geração de token |
 | `POST` | `/usuarios` | Cadastro de usuário (requer ADMIN) |
 | `GET` / `POST` / `PUT` / `DELETE` | `/produtos` | CRUD de produtos |
@@ -201,24 +185,11 @@ VALUES ('Administrador', 'admin@raizesdonordeste.com', '<hash_gerado_aqui>', 'AD
 | `GET` | `/auditoria` | Histórico de ações realizadas no sistema |
 | `GET` | `/relatorios/vendas` | Relatório de vendas |
 
-A lista completa, com todos os parâmetros e exemplos de requisição/resposta, está disponível no Swagger (`/docs`) após subir a aplicação.
-
----------------------------------------------
-
-## 🧪 Testando a API
-
-Recomenda-se utilizar o **Postman** ou **Insomnia** para testar os endpoints. A coleção com os principais cenários de teste está disponível na pasta do projeto (`/postman` ou arquivo `.json` exportado).
-
-Alguns cenários importantes para testar:
-
-- Criar pedido com canal inválido → deve retornar `422`
-- Tentar cancelar um pedido já entregue → deve retornar `409`
-- Tentar adicionar item a um pedido sem estoque suficiente → deve retornar `409`
-- Acessar uma rota protegida sem token → deve retornar `401`
-- Tentar cadastrar usuário sem ser ADMIN → deve retornar `403`
 
 ---------------------------------------------
 
 ## 📄 Licença
 
 Projeto desenvolvido para fins acadêmicos (TCC).
+Universidade Uninter Educacional S/A
+Alfonso Alberto Slovinski Canfild - RU 351946
