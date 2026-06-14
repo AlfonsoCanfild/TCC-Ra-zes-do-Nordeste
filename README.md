@@ -1,5 +1,5 @@
 # PROJETO MULTIDISCIPLINAR do curso de Análise e Desenvolvimento de Sistemas
-# Aluno: Alfonso Aklberto Slovinski Canfild - RU: 351946
+# Aluno: Alfonso Alberto Slovinski Canfild - RU: 351946
 
 # Raízes do Nordeste — API Backend
 
@@ -190,6 +190,6 @@ VALUES ('Administrador', 'admin@raizesdonordeste.com', '<hash_gerado_aqui>', 'AD
 
 ## 📄 Licença
 
-Projeto desenvolvido para fins acadêmicos (TCC).
-Universidade Uninter Educacional S/A
-Alfonso Alberto Slovinski Canfild - RU 351946
+Projeto desenvolvido para fins acadêmicos (TCC) - 
+Universidade Uninter Educacional S/A - 
+Alfonso Alberto Slovinski Canfild - RU 351946.
