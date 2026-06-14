@@ -22,13 +22,14 @@ router = APIRouter(tags=["Auditoria"])
 def listar_auditoria(
     db: Session = Depends(get_db),
     usuario = Depends(
-        permitir_perfis(
-            ["ADMIN"]
-        )
-    )
+        permitir_perfis(["ADMIN"])
+    ),
+    page: int = 1,
+    limit: int = 10 # Limite de 10 itens por página, conforme regra de negócios.
 ):
+    offset = (page - 1) * limit
 
-    return db.query(Auditoria).all()
+    return db.query(Auditoria).offset(offset).limit(limit).all()
 
 # Rota para buscar uma auditoria por ID, acessível apenas para usuários com perfil "ADMIN"
 @router.get(

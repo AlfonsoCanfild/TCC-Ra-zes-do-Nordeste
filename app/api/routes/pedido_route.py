@@ -11,6 +11,8 @@ from app.core.auditoria import registrar_auditoria
 from app.domain.models.pedido import Pedido
 from app.domain.models.usuario import Usuario
 from app.domain.models.unidade import Unidade
+from app.domain.models.item_pedido import ItemPedido
+from app.domain.models.estoque import Estoque
 
 from app.schema.pedido_schema import (
     CanalPedidoEnum,
@@ -91,12 +93,13 @@ def criar_pedido(
 def listar_pedidos(
     db: Session = Depends(get_db),
     usuario_logado = Depends(
-        permitir_perfis(
-            ["ADMIN", "GERENTE"]
-        )
+        permitir_perfis(["ADMIN", "GERENTE"])
     ),
-    canalPedido: CanalPedidoEnum = None
+    canalPedido: CanalPedidoEnum = None,
+    page: int = 1,
+    limit: int = 10 # Limite de 10 itens por página, conforme regra de negócios.
 ):
+    offset = (page - 1) * limit
 
     query = db.query(Pedido)
 
@@ -106,7 +109,8 @@ def listar_pedidos(
             Pedido.canalPedido == canalPedido
         )
 
-    return query.all()
+    return query.offset(offset).limit(limit).all()
+
 
 # Rota para buscar um pedido por ID, considerando a validação do usuário
 @router.get(
@@ -197,6 +201,68 @@ def atualizar_status_pedido(
         db=db,
         idUsuario=usuario.idUsuario,
         acao="ATUALIZAR_STATUS",
+        entidade="PEDIDO",
+        idRegistro=pedido.idPedido
+    )
+
+    return pedido
+
+# Rota para cancelar um pedido, validando o status atual e atualizando o estoque dos itens do pedido
+@router.patch(
+    "/pedidos/{idPedido}/cancelar",
+    response_model=PedidoResponse
+)
+def cancelar_pedido(
+    idPedido: int,
+    db: Session = Depends(get_db),
+    usuario_logado = Depends(
+        permitir_perfis(["ADMIN", "GERENTE"])
+    )
+):
+
+    pedido = db.query(Pedido).filter(
+        Pedido.idPedido == idPedido
+    ).first()
+
+    if not pedido:
+        raise HTTPException(
+            status_code=404,
+            detail="Pedido não encontrado"
+        ) # Se o pedido não for encontrado, retorna um erro 404
+
+    if pedido.status in ["ENTREGUE", "CANCELADO"]:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Não é possível cancelar um pedido com status '{pedido.status}'"
+        ) # Se o pedido já foi entregue ou cancelado, não é possível cancelá-lo novamente
+
+    itens = db.query(ItemPedido).filter(
+        ItemPedido.idPedido == idPedido
+    ).all()
+
+    for item in itens:
+        estoque = db.query(Estoque).filter(
+            Estoque.idProduto == item.idProduto,
+            Estoque.idUnidade == pedido.idUnidade
+        ).first()
+
+        if estoque:
+            estoque.quantidade += item.quantidade # Devolve a quantidade do item ao estoque da unidade
+
+    pedido.status = "CANCELADO"
+
+    db.commit()
+
+    db.refresh(pedido)
+
+    usuario = db.query(Usuario).filter(
+        Usuario.email == usuario_logado["email"]
+    ).first()
+
+    registrar_auditoria(
+        db=db,
+        idUsuario=usuario.idUsuario,
+        acao="CANCELAR",
         entidade="PEDIDO",
         idRegistro=pedido.idPedido
     )

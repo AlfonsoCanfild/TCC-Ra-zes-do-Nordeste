@@ -22,14 +22,14 @@ router = APIRouter(tags=["Fidelidade"]) # Roteador para as rotas relacionadas ao
 def listar_fidelidade(
     db: Session = Depends(get_db),
     usuario = Depends(
-        permitir_perfis(
-            ["ADMIN", "GERENTE"]
-        )
-    )
+        permitir_perfis(["ADMIN", "GERENTE"])
+    ),
+    page: int = 1,
+    limit: int = 10 # Limite de 10 itens por página, conforme regra de negócios.
 ):
+    offset = (page - 1) * limit
 
-    return db.query(Fidelidade).all()
-
+    return db.query(Fidelidade).offset(offset).limit(limit).all()
 
 # Rota para listar os usuários com mais pontos de fidelidade
 @router.get(

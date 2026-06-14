@@ -16,7 +16,10 @@ router = APIRouter(tags=["Usuários"]) # Define o prefixo para as rotas de usuá
 @router.post("/usuarios", status_code=201)
 def criar_usuario(
     usuario: UsuarioCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    usuario_logado = Depends(
+        permitir_perfis(["ADMIN"])
+    )
 ):
 
     novo_usuario = Usuario(

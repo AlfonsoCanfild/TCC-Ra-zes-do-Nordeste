@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.infrastructure.database.database import get_db
 from app.core.auditoria import registrar_auditoria
+from app.core.dependencies import permitir_perfis
 from app.domain.models.pagamento import Pagamento
 from app.domain.models.pedido import Pedido
 from app.domain.models.fidelidade import Fidelidade
@@ -28,7 +29,10 @@ router = APIRouter(tags=["Pagamentos"])
 )
 def realizar_pagamento_mock(
     pagamento: PagamentoMockRequest,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    usuario_logado = Depends(
+        permitir_perfis(["ADMIN", "GERENTE", "CLIENTE"])
+    )
 ):
 
     pedido = db.query(Pedido).filter(

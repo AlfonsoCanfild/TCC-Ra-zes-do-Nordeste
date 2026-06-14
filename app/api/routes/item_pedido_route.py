@@ -103,3 +103,32 @@ def criar_item_pedido(
     db.refresh(novo_item)
 
     return novo_item
+
+# Rota para listar os itens de um pedido específico, considerando a validação do pedido
+@router.get(
+    "/itens-pedido/{idPedido}",
+    response_model=list[ItemPedidoResponse]
+)
+def listar_itens_pedido(
+    idPedido: int,
+    db: Session = Depends(get_db),
+    _ = Depends(
+        permitir_perfis(["ADMIN", "GERENTE", "CLIENTE"])
+    )
+):
+
+    pedido = db.query(Pedido).filter(
+        Pedido.idPedido == idPedido
+    ).first()
+
+    if not pedido:
+        raise HTTPException(
+            status_code=404,
+            detail="Pedido não encontrado"
+        )
+
+    itens = db.query(ItemPedido).filter(
+        ItemPedido.idPedido == idPedido
+    ).all()
+
+    return itens

@@ -3,10 +3,9 @@ from fastapi import Depends
 from fastapi import HTTPException
 
 from sqlalchemy.orm import Session
-
 from app.infrastructure.database.database import get_db
-
 from app.domain.models.unidade import Unidade
+from app.core.dependencies import permitir_perfis
 
 from app.schema.unidade_schema import (
     UnidadeCreate,
@@ -24,7 +23,10 @@ router = APIRouter(tags=["Unidades"])
 )
 def criar_unidade(
     unidade: UnidadeCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    usuario_logado = Depends(
+        permitir_perfis(["ADMIN", "GERENTE"])
+    )
 ):
 
     nova_unidade = Unidade(
@@ -48,12 +50,15 @@ def criar_unidade(
     response_model=list[UnidadeResponse]
 )
 def listar_unidades(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    page: int = 1,
+    limit: int = 10 # Limite de 10 itens por página, conforme regra de negócios.
 ):
+    offset = (page - 1) * limit
 
     unidades = db.query(Unidade).filter(
         Unidade.status == "ATIVO"
-    ).all()
+    ).offset(offset).limit(limit).all()
 
     return unidades
 
@@ -87,7 +92,10 @@ def buscar_unidade(
 def atualizar_unidade(
     idUnidade: int,
     dados: UnidadeUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    usuario_logado = Depends(
+        permitir_perfis(["ADMIN", "GERENTE"])
+    )
 ):
 
     unidade = db.query(Unidade).filter(
@@ -118,7 +126,10 @@ def atualizar_unidade(
 )
 def inativar_unidade(
     idUnidade: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    usuario_logado = Depends(
+        permitir_perfis(["ADMIN"])
+    )
 ):
 
     unidade = db.query(Unidade).filter(

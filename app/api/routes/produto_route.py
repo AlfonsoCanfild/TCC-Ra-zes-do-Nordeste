@@ -62,11 +62,15 @@ def criar_produto(
     response_model=list[ProdutoResponse]
 )
 def listar_produtos(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    page: int = 1,
+    limit: int = 10 # Limite de 10 itens por página, conforme regra de negócios.
 ):
+    offset = (page - 1) * limit # Calcula o deslocamento para a paginação com base no número da página.
+
     produtos = db.query(Produto).filter(
         Produto.status == "ATIVO"
-    ).all()
+    ).offset(offset).limit(limit).all()
 
     return produtos
 

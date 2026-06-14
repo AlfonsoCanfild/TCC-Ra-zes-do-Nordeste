@@ -85,13 +85,18 @@ def criar_estoque(
     "/estoque",
     response_model=list[EstoqueResponse]
 )
-def listar_estoque(
-    db: Session = Depends(get_db)
+def listar_unidades(
+    db: Session = Depends(get_db),
+    page: int = 1,
+    limit: int = 10 # Limite de 10 itens por página, conforme regra de negócios.
 ):
+    offset = (page - 1) * limit
 
-    estoque = db.query(Estoque).all()
+    unidades = db.query(Unidade).filter(
+        Unidade.status == "ATIVO" # Apenas estoques de unidades ativas devem ser listados, conforme regra de negócios.
+    ).offset(offset).limit(limit).all()
 
-    return estoque
+    return unidades
 
 
 # Rota para buscar um estoque por ID.
