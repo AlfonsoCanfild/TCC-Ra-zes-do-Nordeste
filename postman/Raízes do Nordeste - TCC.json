@@ -1,0 +1,358 @@
+{
+  "v": 12,
+  "name": "Raízes do Nordeste - TCC",
+  "folders": [
+    {
+      "v": 12,
+      "name": "Auth",
+      "folders": [],
+      "requests": [
+        {
+          "v": "17",
+          "name": "T01 - Login válido",
+          "method": "POST",
+          "endpoint": "http://127.0.0.1:8000/auth/login",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/x-www-form-urlencoded",
+            "body": "username: admin@email.com\npassword: 123456"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        },
+        {
+          "v": "17",
+          "name": "T02 — Login sem token em rota protegida (negativo)",
+          "method": "GET",
+          "endpoint": "http://127.0.0.1:8000/pedidos",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        },
+        {
+          "v": "17",
+          "name": "T03 — Acesso com perfil sem permissão (negativo)",
+          "method": "GET",
+          "endpoint": "http://127.0.0.1:8000/auditoria",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "bearer",
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhbGZAZW1haWwuY29tIiwicGVyZmlsIjoiQ0xJRU5URSIsImlkVXN1YXJpbyI6MywiZXhwIjoxNzgxNTI2MjU1fQ.cVwcoTIkfA3MEjSGpk0bGaQratU5BjT8wL2uqxfiFws",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        }
+      ],
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "headers": [],
+      "variables": [],
+      "description": null,
+      "preRequestScript": "",
+      "testScript": ""
+    },
+    {
+      "v": 12,
+      "name": "Produtos",
+      "folders": [],
+      "requests": [
+        {
+          "v": "17",
+          "name": "T04 — Criar produto (positivo)",
+          "method": "POST",
+          "endpoint": "http://127.0.0.1:8000/produtos",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "bearer",
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBlbWFpbC5jb20iLCJwZXJmaWwiOiJBRE1JTiIsImlkVXN1YXJpbyI6MSwiZXhwIjoxNzgxNTIyODAyfQ.DT_ti57nQcwSn7AGfvAuubBp0MR17389Tfs6__KhHdM",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"nome\": \"Baião de Dois\",\n  \"descricao\": \"Prato típico nordestino\",\n  \"preco\": 29.90,\n  \"status\": \"ATIVO\"\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        },
+        {
+          "v": "17",
+          "name": "T05 — Listar produtos (positivo)",
+          "method": "GET",
+          "endpoint": "http://127.0.0.1:8000/produtos?page=1&limit=10",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "bearer",
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBlbWFpbC5jb20iLCJwZXJmaWwiOiJBRE1JTiIsImlkVXN1YXJpbyI6MSwiZXhwIjoxNzgxNTIyODAyfQ.DT_ti57nQcwSn7AGfvAuubBp0MR17389Tfs6__KhHdM",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        }
+      ],
+      "auth": {
+        "authActive": true,
+        "authType": "inherit"
+      },
+      "headers": [],
+      "variables": [],
+      "description": null,
+      "preRequestScript": "",
+      "testScript": ""
+    },
+    {
+      "v": 12,
+      "name": "Pedidos",
+      "folders": [],
+      "requests": [
+        {
+          "v": "17",
+          "name": "T06 — Criar pedido com canal válido (positivo)",
+          "method": "POST",
+          "endpoint": "http://127.0.0.1:8000/pedidos",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "bearer",
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBlbWFpbC5jb20iLCJwZXJmaWwiOiJBRE1JTiIsImlkVXN1YXJpbyI6MSwiZXhwIjoxNzgxNTIyODAyfQ.DT_ti57nQcwSn7AGfvAuubBp0MR17389Tfs6__KhHdM",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"idUnidade\": 1,\n  \"canalPedido\": \"TOTEM\"\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        },
+        {
+          "v": "17",
+          "name": "T07 — Criar pedido com canal inválido (negativo)",
+          "method": "POST",
+          "endpoint": "http://127.0.0.1:8000/pedidos",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "bearer",
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBlbWFpbC5jb20iLCJwZXJmaWwiOiJBRE1JTiIsImlkVXN1YXJpbyI6MSwiZXhwIjoxNzgxNTIyODAyfQ.DT_ti57nQcwSn7AGfvAuubBp0MR17389Tfs6__KhHdM",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"idUnidade\": 1,\n  \"canalPedido\": \"DRIVE_THRU\"\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        },
+        {
+          "v": "17",
+          "name": "T08 — Adicionar item com estoque insuficiente (negativo)",
+          "method": "POST",
+          "endpoint": "http://127.0.0.1:8000/itens-pedido",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "bearer",
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBlbWFpbC5jb20iLCJwZXJmaWwiOiJBRE1JTiIsImlkVXN1YXJpbyI6MSwiZXhwIjoxNzgxNTIyODAyfQ.DT_ti57nQcwSn7AGfvAuubBp0MR17389Tfs6__KhHdM",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"idPedido\": 1,\n  \"idProduto\": 1,\n  \"quantidade\": 99999\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        },
+        {
+          "v": "17",
+          "name": "T09 — Filtrar pedidos por canal (positivo)",
+          "method": "GET",
+          "endpoint": "http://127.0.0.1:8000/pedidos?canalPedido=TOTEM",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "bearer",
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBlbWFpbC5jb20iLCJwZXJmaWwiOiJBRE1JTiIsImlkVXN1YXJpbyI6MSwiZXhwIjoxNzgxNTIyODAyfQ.DT_ti57nQcwSn7AGfvAuubBp0MR17389Tfs6__KhHdM",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        }
+      ],
+      "auth": {
+        "authActive": true,
+        "authType": "inherit"
+      },
+      "headers": [],
+      "variables": [],
+      "description": null,
+      "preRequestScript": "",
+      "testScript": ""
+    },
+    {
+      "v": 12,
+      "name": "Pagamento",
+      "folders": [],
+      "requests": [
+        {
+          "v": "17",
+          "name": "T10 — Pagamento mock aprovado (positivo)",
+          "method": "POST",
+          "endpoint": "http://127.0.0.1:8000/pagamentos/mock",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "bearer",
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBlbWFpbC5jb20iLCJwZXJmaWwiOiJBRE1JTiIsImlkVXN1YXJpbyI6MSwiZXhwIjoxNzgxNTIyODAyfQ.DT_ti57nQcwSn7AGfvAuubBp0MR17389Tfs6__KhHdM",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"idPedido\": 1,\n  \"formaPagamento\": \"PIX\"\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        },
+        {
+          "v": "17",
+          "name": "T11 — Pagamento mock recusado (negativo)",
+          "method": "POST",
+          "endpoint": "http://127.0.0.1:8000/pagamentos/mock",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "bearer",
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBlbWFpbC5jb20iLCJwZXJmaWwiOiJBRE1JTiIsImlkVXN1YXJpbyI6MSwiZXhwIjoxNzgxNTIyODAyfQ.DT_ti57nQcwSn7AGfvAuubBp0MR17389Tfs6__KhHdM",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"idPedido\": 2,\n  \"formaPagamento\": \"RECUSADO\"\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        }
+      ],
+      "auth": {
+        "authActive": true,
+        "authType": "inherit"
+      },
+      "headers": [],
+      "variables": [],
+      "description": null,
+      "preRequestScript": "",
+      "testScript": ""
+    },
+    {
+      "v": 12,
+      "name": "Auditoria",
+      "folders": [],
+      "requests": [
+        {
+          "v": "17",
+          "name": "T12 — Consultar auditoria após ação sensível (positivo)",
+          "method": "GET",
+          "endpoint": "http://127.0.0.1:8000/auditoria",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "bearer",
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBlbWFpbC5jb20iLCJwZXJmaWwiOiJBRE1JTiIsImlkVXN1YXJpbyI6MSwiZXhwIjoxNzgxNTIyODAyfQ.DT_ti57nQcwSn7AGfvAuubBp0MR17389Tfs6__KhHdM",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        }
+      ],
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "headers": [],
+      "variables": [],
+      "description": null,
+      "preRequestScript": "",
+      "testScript": ""
+    }
+  ],
+  "requests": [],
+  "auth": {
+    "authType": "none",
+    "authActive": true
+  },
+  "headers": [],
+  "variables": [],
+  "description": "",
+  "preRequestScript": "",
+  "testScript": ""
+}
